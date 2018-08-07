@@ -4,22 +4,23 @@ const request = require("request");
 
 const client = new Discord.Client({disableEveryone: true});
 var latestGameProcessedId = -1;
-const apiKey = "xxx"
+const apiKey = config.apiKey; // riotgames developer API key.
 
 
+// Simple function to post an embed in a text chat.
 function postInChat() {
-  var channel = client.channels.find(channel => channel.name == 'general');
+  var channel = client.channels.find(channel => channel.name == 'general'); // find text channel.
   let embed = new Discord.RichEmbed()
   .setTitle("Ronny won a game!")
   .setDescription("Who would've thought?")
   .setColor('#c14580')
   .setThumbnail('https://s.lolstatic.com/errors/0.0.9/images/lol_logo.png');
-  channel.send(embed);
+  channel.send(embed); // send embed to text channel
 }
 
-
-function winCheck(gameId) {
-  console.log("checking if game was won " + gameId);
+// function that checks whether the game with gameId was won by playerId
+function winCheck(gameId, playerId) {
+  console.log("checking if game with ID " + gameId + " was won");
   var options = {
     url: "https://euw1.api.riotgames.com/lol/match/v3/matches/" + gameId,
     headers: {
@@ -34,7 +35,7 @@ function winCheck(gameId) {
       var data = JSON.parse(body);
       var playerNumber = -1
       data.participantIdentities.forEach(function(pl) {
-        if (pl.player.accountId == 202123840){
+        if (pl.player.accountId == playerId){
           playerNumber = pl.participantId;
           if (data.participants[playerNumber-1].stats.win) {
             postInChat();
@@ -42,21 +43,21 @@ function winCheck(gameId) {
         }
       });
       if (playerNumber == -1) {
-        console.log("player not found");
+        console.log("player " + playerId + " not found");
       }
     } else {
-      console.log("error1");
+      console.log(error);
+      console.log(response.statusCode);
     }
   })
 };
 
-
 client.on("ready", async () => {
   console.log(`${client.user.username} is online!`);
   client.user.setActivity("with your ♥");
-  var i = 0;
+  var i = 1;
   const timer = setInterval(function () {
-    console.log("Test" + i++)
+    console.log("Times checked: " + i++);
 
     var options = {
       url: "https://euw1.api.riotgames.com/lol/match/v3/matchlists/by-account/202123840?endIndex=1",
@@ -70,18 +71,17 @@ client.on("ready", async () => {
     request(
       options,
       function (error, response, body){
+        console.log("     limits: " + response.headers["x-app-rate-limit"]);
+        console.log("Current use: " + response.headers["x-app-rate-limit-count"]);
         if (!error && response.statusCode == 200){
           var data = JSON.parse(body);
           if (data.matches[0].gameId != latestGameProcessedId){
             latestGameProcessedId = data.matches[0].gameId;
-            winCheck(data.matches[0].gameId);
-          } else {
-            console.log("No new games");
+            winCheck(data.matches[0].gameId, config.playerId);
           }
         }
       }
     );
-
   }, 60000);
 
 });
