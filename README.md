@@ -1,4 +1,6 @@
 # League-win-Discord-bot
+**Note config.json file is not included**
+
 A simple discord bot that sends a message in a text channel everytime I win a game in League of Legends.
 
 The bot works by requesting my latest game from the league of legends API every minute and checking whether it is new.
@@ -16,3 +18,13 @@ This would be things like:
 * Kills/Deaths/Assists
 * Game length
 * Character
+
+
+## Config file
+The config file is a json file that requires the following key-value pairs
+
+Key|Value
+-----|-----
+"token"|discord bot token(string)
+"apiKey"|riot games API key(string)
+"playerId"|league of legends accountId(integer)
