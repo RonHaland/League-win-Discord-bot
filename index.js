@@ -1,10 +1,10 @@
-const botconfig = require("./botconfig.json");
+const config = require("./config.json");
 const Discord = require("discord.js");
 const request = require("request");
 
 const client = new Discord.Client({disableEveryone: true});
 var latestGameProcessedId = -1;
-const apiKey = ""
+const apiKey = "xxx"
 
 
 function postInChat() {
@@ -85,4 +85,4 @@ client.on("ready", async () => {
   }, 60000);
 
 });
-client.login(botconfig.token);
+client.login(config.token);
