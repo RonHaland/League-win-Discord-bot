@@ -62,3 +62,4 @@ typings/
 
 # config file with tokens and API-keys
 config.json
+testFile.json
